@@ -6,3 +6,4 @@ data/*.db
 .env
 .vscode/
 *.log
+notebooks/data
