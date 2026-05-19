@@ -55,6 +55,48 @@ Task 2 output schema:
 - `sentiment_score`
 - `identified_theme`
 
+## Task 3: PostgreSQL Storage
+
+Task 3 persists the cleaned and enriched review data in PostgreSQL using a two-table relational design.
+
+What it does:
+
+- Creates a `bank_reviews` database schema with `banks` and `reviews` tables
+- Loads the cleaned Task 1 CSV and the Task 2 sentiment output
+- Rebuilds the review identifier used in Task 2 so the datasets can be merged deterministically
+- Inserts bank metadata first, then inserts the processed review rows with sentiment and theme fields
+- Runs verification queries for review counts, average ratings, and null checks
+
+Main files:
+
+- [scripts/task3_postgresql_storage.py](scripts/task3_postgresql_storage.py)
+- [src/task3_storage.py](src/task3_storage.py)
+- [scripts/schema.sql](scripts/schema.sql)
+
+Required connection setting:
+
+- `BANK_REVIEWS_DATABASE_URL` or `DATABASE_URL`
+
+Example PostgreSQL URL:
+
+```powershell
+postgresql+psycopg2://postgres:postgres@localhost:5432/bank_reviews
+```
+
+Run the loader from the repository root:
+
+```powershell
+python .\scripts\task3_postgresql_storage.py
+```
+
+The script looks for the Task 1 and Task 2 CSV files in both `data/processed/` and `notebooks/data/processed/`, so it works with the current notebook outputs without manual copying.
+
+Verification queries returned by the script:
+
+- Reviews per bank
+- Average rating per bank
+- Null counts for the key review columns
+
 ## Repository Structure
 
 - `data/` - generated data artifacts
@@ -79,9 +121,11 @@ Then run Task 1 first, followed by Task 2.
 - The repository keeps generated CSV files out of version control via `.gitignore`.
 - Transformer sentiment in Task 2 is optional and may download model weights on first run.
 - The cleaned data currently contains 1,135 reviews total across the three banks.
+- Task 3 uses PostgreSQL; if you do not have a local database running, set `BANK_REVIEWS_DATABASE_URL` before launching the loader.
 
 ## Deliverables
 
 - Cleaned review dataset for downstream analysis
 - Sentiment comparison and theme extraction notebook
 - Analysis-ready CSV for reporting and visualization
+- PostgreSQL schema and insertion script for persisted review storage
